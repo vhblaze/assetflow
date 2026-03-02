@@ -1,38 +1,34 @@
 # AssetFlow
 
+Production-oriented investment management platform designed to simulate a real-world fintech backend architecture.
+
 ---
 
 # 🇺🇸 English Version
 
-## AssetFlow
+## Overview
 
-AssetFlow is a production-oriented investment management platform designed to simulate a real-world fintech backend architecture.
+**AssetFlow** is a fintech-oriented backend system built to demonstrate production-grade architecture for financial applications.
 
-This project demonstrates how financial systems must be structured to ensure data integrity, auditability, deterministic calculations, and controlled AI integration.
+It focuses on:
 
----
+- Deterministic financial calculations  
+- Auditability and traceability  
+- Secure authentication and authorization  
+- Risk-aware portfolio modeling  
+- Controlled AI integration  
+- Service isolation (microservice-ready architecture)
 
-## Why This Project Was Built
-
-Financial systems require more than standard CRUD operations. They demand:
-
-- Transactional integrity  
-- Traceable financial state transitions  
-- Deterministic portfolio calculations  
-- Risk monitoring  
-- Strict access control  
-- Audit logging  
-- Service isolation  
-
-AssetFlow was designed with these constraints in mind.
+This project reflects how real financial systems are structured for reliability, compliance, and scalability.
 
 ---
 
-## Architecture Overview
+## Architecture
 
-The system is divided into two isolated services:
+AssetFlow is composed of two isolated services:
 
-### Core API (Node.js + Prisma + PostgreSQL)
+### 1️⃣ Core API  
+**Stack:** Node.js + Prisma + PostgreSQL  
 
 Responsible for:
 
@@ -45,41 +41,53 @@ Responsible for:
 - Audit logging  
 - Financial metric aggregation  
 
-The Core API acts as the single source of business logic and data persistence.
+The Core API acts as the **single source of truth** for business logic and data persistence.
 
-### AI Insight Service (Python + FastAPI)
+---
+
+### 2️⃣ AI Insight Service  
+**Stack:** Python + FastAPI  
 
 Responsible for:
 
 - Structured portfolio metric analysis  
-- AI-powered daily financial insight generation  
+- AI-generated daily financial insights  
 - Deterministic JSON responses  
 - Stateless processing  
 
-The AI service does not access the database directly.  
+The AI service does **not** access the database directly.  
 All communication occurs via controlled internal HTTP requests.
+
+This separation ensures:
+
+- Security  
+- Scalability  
+- Deterministic financial control  
+- Service independence  
 
 ---
 
 ## Financial Modeling Strategy
 
-Instead of recalculating historical performance dynamically, the system stores daily portfolio snapshots.
+Instead of recalculating historical performance dynamically, AssetFlow stores **daily portfolio snapshots**.
 
-This ensures:
+Benefits:
 
 - Historical accuracy  
 - Deterministic reporting  
 - Audit-friendly state reconstruction  
-- Performance optimization  
 - Reduced computational overhead  
+- Improved query performance  
 
 Each snapshot represents the portfolio state at a specific point in time.
 
 ---
 
-## AI-Assisted Insight Engine
+## AI Insight Engine
 
-Daily insights are generated using structured metrics such as:
+The AI service transforms structured financial metrics into contextual analytical feedback.
+
+### Input Metrics
 
 - Portfolio value  
 - Daily and weekly returns  
@@ -89,33 +97,76 @@ Daily insights are generated using structured metrics such as:
 - Contribution consistency  
 - User risk profile  
 
-The AI engine transforms quantitative metrics into contextualized analytical feedback without issuing prescriptive investment advice.
+### Compliance Rules
+
+- No buy/sell recommendations  
+- No prescriptive language  
+- No invented data  
+- Observational tone only  
+- Strict JSON validation and normalization  
 
 Each insight is versioned and stored for traceability.
 
 ---
 
-## Security and Data Integrity
+## Security & Data Integrity
 
 AssetFlow includes:
 
-- Password hashing  
+- Secure password hashing  
 - Expiring JWT authentication  
-- Role-based authorization  
+- RBAC authorization  
 - Explicit foreign key constraints  
-- Unique constraints on daily portfolio states  
+- Unique constraints for daily portfolio states  
 - Indexed time-series queries  
 - JSONB metadata fields  
-- Audit trail persistence  
+- Persistent audit logs  
 - Service-to-service isolation  
 
-PostgreSQL acts as the single source of truth.
+PostgreSQL acts as the **single source of truth**.
+
+---
+
+## Project Structure
+
+
+```text
+assetflow/
+├── backend/              # Node.js Core API
+└── ai-services/          # Python AI Insight Service
+    ├── app/
+    │   ├── main.py
+    │   ├── insight/
+    │   │   ├── generator.py
+    │   │   ├── prompts.py
+    │   │   └── validators.py
+    │   └── providers/
+    │       ├── base.py
+    │       └── llama8b.py
+    ├── requirements.txt
+    └── README.md
+```
+---
+
+## Running Locally
+
+### AI Insight Service
+
+From inside the `ai-services` directory:
+
+```bash
+pip install -r requirements.txt
+python -m uvicorn app.main:app --reload
+```
+Swagger documentation:
+
+http://127.0.0.1:8000/docs
 
 ---
 
 ## Technical Objectives
 
-This project was built to demonstrate:
+This project demonstrates:
 
 - Fintech backend architecture  
 - Financial data modeling strategies  
@@ -129,82 +180,88 @@ This project was built to demonstrate:
 
 # 🇧🇷 Versão em Português
 
-## AssetFlow
+## Visão Geral
 
-AssetFlow é uma plataforma de gestão de investimentos orientada a produção, projetada para simular a arquitetura de backend de uma fintech real.
+**AssetFlow** é um sistema backend orientado a fintech, desenvolvido para demonstrar uma arquitetura de produção voltada a aplicações financeiras.
 
-O projeto demonstra como sistemas financeiros devem ser estruturados para garantir integridade de dados, rastreabilidade, cálculos determinísticos e integração controlada de IA.
+O projeto foca em:
 
----
+- Cálculos financeiros determinísticos  
+- Auditoria e rastreabilidade  
+- Autenticação e autorização seguras  
+- Modelagem de risco e carteira  
+- Integração controlada de IA  
+- Isolamento entre serviços (arquitetura pronta para microserviços)
 
-## Por que este projeto foi desenvolvido
-
-Sistemas financeiros exigem mais do que operações básicas de CRUD. Eles demandam:
-
-- Integridade transacional  
-- Rastreamento de mudanças no estado financeiro  
-- Cálculos determinísticos de carteira  
-- Monitoramento de risco  
-- Controle rigoroso de acesso  
-- Registro de auditoria  
-- Isolamento entre serviços  
-
-O AssetFlow foi projetado considerando essas exigências.
+Ele reflete como sistemas financeiros reais são estruturados para garantir confiabilidade, compliance e escalabilidade.
 
 ---
 
-## Visão Geral da Arquitetura
+## Arquitetura
 
-O sistema é dividido em dois serviços isolados:
+O AssetFlow é composto por dois serviços isolados:
 
-### API Principal (Node.js + Prisma + PostgreSQL)
+### 1️⃣ API Principal  
+**Stack:** Node.js + Prisma + PostgreSQL  
 
 Responsável por:
 
-- Autenticação com JWT  
+- Autenticação JWT  
 - Controle de acesso baseado em papéis (RBAC)  
 - Gestão de ativos e aportes  
 - Transições de estado da carteira  
-- Geração de snapshots diários  
+- Snapshots diários da carteira  
 - Cálculo de rentabilidade e risco  
 - Logs de auditoria  
 - Agregação de métricas financeiras  
 
-A API Principal atua como fonte única de lógica de negócio e persistência de dados.
+A API Principal atua como **fonte única de verdade** da lógica de negócio e persistência de dados.
 
-### Serviço de Insights com IA (Python + FastAPI)
+---
+
+### 2️⃣ Serviço de Insights com IA  
+**Stack:** Python + FastAPI  
 
 Responsável por:
 
 - Análise estruturada de métricas da carteira  
 - Geração de insights financeiros diários com IA  
-- Retorno determinístico em formato JSON  
+- Retorno determinístico em JSON  
 - Processamento stateless  
 
-O serviço de IA não possui acesso direto ao banco de dados.  
-Toda comunicação ocorre por meio de requisições HTTP internas controladas.
+O serviço de IA **não possui acesso direto ao banco de dados**.  
+Toda comunicação ocorre via requisições HTTP internas controladas.
+
+Essa separação garante:
+
+- Segurança  
+- Escalabilidade  
+- Controle determinístico do backend financeiro  
+- Independência entre serviços  
 
 ---
 
 ## Estratégia de Modelagem Financeira
 
-Em vez de recalcular a performance histórica dinamicamente, o sistema armazena snapshots diários da carteira.
+Em vez de recalcular a performance histórica dinamicamente, o AssetFlow armazena **snapshots diários da carteira**.
 
 Isso garante:
 
 - Precisão histórica  
 - Relatórios determinísticos  
 - Reconstrução auditável de estado  
-- Otimização de performance  
 - Redução de custo computacional  
+- Melhor performance em consultas  
 
-Cada snapshot representa o estado da carteira em uma data específica.
+Cada snapshot representa o estado exato da carteira em uma data específica.
 
 ---
 
 ## Engine de Insights com IA
 
-Os insights diários são gerados a partir de métricas estruturadas como:
+O serviço de IA transforma métricas financeiras estruturadas em feedback analítico contextualizado.
+
+### Métricas de Entrada
 
 - Valor total da carteira  
 - Retorno diário e semanal  
@@ -214,7 +271,13 @@ Os insights diários são gerados a partir de métricas estruturadas como:
 - Consistência de aportes  
 - Perfil de risco do usuário  
 
-A IA transforma métricas quantitativas em feedback analítico contextualizado, sem emitir recomendações prescritivas de investimento.
+### Regras de Compliance
+
+- Não recomendar compra ou venda  
+- Não usar linguagem prescritiva  
+- Não inventar dados  
+- Tom observacional  
+- Validação e normalização rigorosa do JSON  
 
 Cada insight é versionado e armazenado para garantir rastreabilidade.
 
@@ -226,15 +289,15 @@ O AssetFlow inclui:
 
 - Hash seguro de senha  
 - JWT com expiração  
-- Autorização baseada em papéis  
-- Restrições explícitas de chave estrangeira  
+- RBAC  
+- Constraints explícitas de chave estrangeira  
 - Constraints únicas para estados diários  
 - Índices para consultas temporais  
-- Uso de JSONB para metadados flexíveis  
-- Persistência de trilha de auditoria  
+- Campos JSONB para metadados  
+- Logs persistentes de auditoria  
 - Isolamento entre serviços  
 
-O PostgreSQL atua como fonte única de verdade.
+O PostgreSQL atua como **fonte única de verdade**.
 
 ---
 
@@ -242,10 +305,10 @@ O PostgreSQL atua como fonte única de verdade.
 
 Este projeto foi desenvolvido para demonstrar:
 
-- Arquitetura de backend para fintech  
-- Estratégias de modelagem de dados financeiros  
+- Arquitetura backend para fintech  
+- Estratégias de modelagem financeira  
 - Padrões de autenticação segura  
-- Design orientado a auditoria  
+- Design orientado à auditoria  
 - Comunicação entre microserviços  
 - Sistemas de suporte à decisão com IA  
-- Práticas de engenharia voltadas para produção  
+- Boas práticas voltadas à produção  
