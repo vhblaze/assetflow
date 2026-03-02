@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum RiskProfile {
+  CONSERVADOR
+  MODERADO
+  ARROJADO
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  GENERATE_INSIGHT
+}
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  email        String     @unique
+  name         String?
+  passwordHash String
+  role         UserRole   @default(USER)
+  riskProfile  RiskProfile @default(MODERADO)
+
+  portfolios   Portfolio[]
+  insights     Insight[]
+  auditLogs    AuditLog[]  @relation("AuditActor")
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([createdAt])
+}
+
+model Portfolio {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name      String
+  currency  String   @default("BRL") // ex: BRL, USD
+
+  assets        Asset[]
+  contributions Contribution[]
+  dailyMetrics  DailyMetric[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@unique([userId, name])
+}
+
+model Asset {
+  id          String   @id @default(uuid()) @db.Uuid
+  portfolioId String   @db.Uuid
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  symbol      String
+  name        String?
+  assetType   String?
+
+  quantity    Decimal  @default(0) @db.Decimal(24, 8)
+  avgPrice    Decimal  @default(0) @db.Decimal(24, 8)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([portfolioId])
+  @@unique([portfolioId, symbol])
+}
+
+model Contribution {
+  id          String   @id @default(uuid()) @db.Uuid
+  portfolioId String   @db.Uuid
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  date        DateTime @db.Date
+  amount      Decimal  @db.Decimal(18, 2)
+  note        String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([portfolioId, date])
+}
+
+model DailyMetric {
+  id          String   @id @default(uuid()) @db.Uuid
+  portfolioId String   @db.Uuid
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  date                    DateTime @db.Date
+
+  portfolioValue          Decimal  @db.Decimal(18, 2)
+  dailyReturnPct          Decimal? @db.Decimal(9, 4)
+  weeklyReturnPct         Decimal? @db.Decimal(9, 4)
+  volatility7dPct         Decimal? @db.Decimal(9, 4)
+  maxDrawdown30dPct       Decimal? @db.Decimal(9, 4)
+  concentrationTop1Pct    Decimal? @db.Decimal(9, 4)
+  concentrationTop3Pct    Decimal? @db.Decimal(9, 4)
+  contributionToday       Decimal? @db.Decimal(18, 2)
+  daysSinceLastContribution Int?
+
+  alerts Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([portfolioId, date])
+  @@index([date])
+  @@index([portfolioId, date])
+}
+
+model Insight {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  date       DateTime @db.Date
+  locale     String   @default("pt-BR")
+
+  headline   String
+  message    String
+  tags       String[] // whitelist no backend
+  confidence Decimal  @db.Decimal(3, 2)
+  disclaimer String
+
+  payload    Json
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([date])
+  @@index([userId, date])
+}
+
+model AuditLog {
+  id          String      @id @default(uuid()) @db.Uuid
+
+  actorUserId String?     @db.Uuid
+  actor       User?       @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  action      AuditAction
+  entityType  String      // ex: "Portfolio", "Asset", "Insight"
+  entityId    String?     // uuid como string (pode ser Uuid depois se você quiser)
+  metadata    Json?
+
+  ip          String?
+  userAgent   String?
+
+  createdAt   DateTime    @default(now())
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([entityType, entityId])
+}
